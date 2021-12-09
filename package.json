@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www --trace-warnings",
-    "prod": "pm2 start bin/www"
+    "prod": "pm2 start bin/www --name web3-storage"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
