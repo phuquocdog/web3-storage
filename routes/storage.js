@@ -26,6 +26,17 @@ async function storeFiles(files) {
   console.log('stored files with cid:', cid)
   return cid
 }
+async function retrieve(cid) {
+  const client = makeStorageClient()
+  const res = await client.get(cid)
+  console.log(`Got a response! [${res.status}] ${res.statusText}`)
+  if (!res.ok) {
+    throw new Error(`failed to get ${cid}`)
+  }
+  const files = await res.files();
+  
+  return files[0];
+}
 
 router.post('/', async function(req, res, next) {
   try {
@@ -47,7 +58,7 @@ router.post('/', async function(req, res, next) {
         //send response
         res.send({
             status: true,
-            message: 'File is uploaded',
+            message: 'File is retrieve',
             data: {
                 name: file.name,
                 mimetype: file.mimetype,
@@ -57,6 +68,26 @@ router.post('/', async function(req, res, next) {
             }
         });
       }
+  } catch (err) {
+      console.log(err)
+      res.status(500).send(err);
+  }
+});
+router.get('/:id', async function(req, res, next) {
+  try {
+    let file = await retrieve(req.params.id);
+
+    console.log(file);
+    res.send({
+        status: true,
+        message: 'File is uploaded',
+        data: {
+            name: file.name,
+            size: file.size,
+            cid: req.params.id,
+            dwebLink: 'https://' + req.params.id + '.ipfs.dweb.link/' + file.name
+        }
+    });
   } catch (err) {
       console.log(err)
       res.status(500).send(err);
